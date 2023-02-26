@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
+import useSound from "use-sound";
+import countdown from "../Components/Sounds/countdown.wav";
 
 const Timer = () => {
   const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [timerId, setTimerId] = useState(null);
   const [animation, setAnimation] = useState(false);
+  const [playSound, setPlaySound] = useState(false);
+
+  const [playCountdown] = useSound(countdown);
 
   useEffect(() => {
     if (time.hours === 0 && time.minutes === 0 && time.seconds === 0) {
@@ -11,6 +16,12 @@ const Timer = () => {
       setAnimation(false);
     }
   }, [time, timerId]);
+
+  useEffect(() => {
+    if (playSound) {
+      playCountdown();
+    }
+  }, [playSound, playCountdown]);
 
   const startTimer = () => {
     if (timerId) {
@@ -34,6 +45,9 @@ const Timer = () => {
             } else {
               seconds--;
             }
+            if (hours === 0 && minutes < 5 && !playSound) {
+              setPlaySound(true);
+            }
             return { hours, minutes, seconds };
           });
           setAnimation(true);
@@ -53,6 +67,7 @@ const Timer = () => {
     setTime({ hours: 0, minutes: 0, seconds: 0 });
     setTimerId(null);
     setAnimation(false);
+    setPlaySound(false);
     document.getElementById("hour-input").value = "";
     document.getElementById("min-input").value = "";
     document.getElementById("second-input").value = "";
